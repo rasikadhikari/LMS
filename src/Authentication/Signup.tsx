@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
+  const [userType, setUserType] = useState<"student" | "institute">("student");
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
       <div className="w-full max-w-md bg-gray-900 p-8 rounded-lg shadow-lg">
@@ -11,6 +13,7 @@ const Signup: React.FC = () => {
         </h2>
 
         <form className="space-y-4">
+          {/* Full Name */}
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
             <input
@@ -20,6 +23,7 @@ const Signup: React.FC = () => {
             />
           </div>
 
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
@@ -29,6 +33,7 @@ const Signup: React.FC = () => {
             />
           </div>
 
+          {/* Password */}
           <div>
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
@@ -38,6 +43,37 @@ const Signup: React.FC = () => {
             />
           </div>
 
+          {/* User Type - Radio Buttons */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Register As
+            </label>
+            <div className="flex space-x-4">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  value="student"
+                  checked={userType === "student"}
+                  onChange={() => setUserType("student")}
+                  className="w-4 h-4 text-green-500 focus:ring-green-500"
+                />
+                <span>Student</span>
+              </label>
+
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  value="institute"
+                  checked={userType === "institute"}
+                  onChange={() => setUserType("institute")}
+                  className="w-4 h-4 text-green-500 focus:ring-green-500"
+                />
+                <span>Institute</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Sign Up Button */}
           <button
             type="submit"
             className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded transition"
@@ -45,10 +81,14 @@ const Signup: React.FC = () => {
             Sign Up
           </button>
 
+          {/* Already have an account */}
           <p className="text-center text-sm mt-4">
             <a
               href="/login"
-              onClick={() => navigate("/login")}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/login");
+              }}
               className="text-blue-400 hover:underline"
             >
               Login
