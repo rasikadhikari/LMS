@@ -44,34 +44,6 @@ const Signup: React.FC = () => {
           </div>
 
           {/* User Type - Radio Buttons */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Register As
-            </label>
-            <div className="flex space-x-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  value="student"
-                  checked={userType === "student"}
-                  onChange={() => setUserType("student")}
-                  className="w-4 h-4 text-green-500 focus:ring-green-500"
-                />
-                <span>Student</span>
-              </label>
-
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  value="institute"
-                  checked={userType === "institute"}
-                  onChange={() => setUserType("institute")}
-                  className="w-4 h-4 text-green-500 focus:ring-green-500"
-                />
-                <span>Institute</span>
-              </label>
-            </div>
-          </div>
 
           {/* Sign Up Button */}
           <button

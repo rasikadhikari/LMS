@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import Header from "./Layout/Header";
 import Footer from "./Layout/Footer";
+import AdminHeader from "./Layout/AdminHeader";
 
 // Lazy-loaded pages
 const Dashboard = lazy(() => import("./Pages/Dashboard"));
@@ -10,9 +11,14 @@ const Login = lazy(() => import("./Authentication/Login"));
 const Signup = lazy(() => import("./Authentication/Signup"));
 const Home = lazy(() => import("./Pages/Home"));
 const Profile = lazy(() => import("./Pages/User"));
-const Course = lazy(() => import("./Pages/Course"));
-const Lesson = lazy(() => import("./Pages/Lesson"));
-const Enrollment = lazy(() => import("./Pages/Enrollment"));
+const Course = lazy(() => import("./Pages/CourseDetail"));
+const Lesson = lazy(() => import("./Organization/Lesson"));
+const Enrollment = lazy(() => import("./Organization/Enrollment"));
+
+// admin
+const AdminCourse = lazy(() => import("./Organization/Course"));
+const AdminEnrollment = lazy(() => import("./Organization/Enrollment"));
+const AdminLesson = lazy(() => import("./Organization/Lesson"));
 
 function App() {
   return (
@@ -28,9 +34,11 @@ function AppContent() {
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/signup";
 
+  const isAdminPage = location.pathname.startsWith("/admin");
+
   return (
     <>
-      <Header />
+      {!isAuthPage && (isAdminPage ? <AdminHeader /> : <Header />)}
       <div className="flex">
         <div className="flex-grow">
           <Suspense
@@ -40,15 +48,19 @@ function AppContent() {
           >
             <Routes>
               <Route path="/" element={<Dashboard />}></Route>
-              {/* Student routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-
               <Route path="/home" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/course" element={<Course />} />
               <Route path="/lesson" element={<Lesson />} />
               <Route path="/enrollment" element={<Enrollment />} />
+
+              <Route path="/admin">
+                <Route path="adminCourse" element={<AdminCourse />} />
+                <Route path="adminEnrollment" element={<AdminEnrollment />} />
+                <Route path="adminLesson" element={<AdminLesson />} />
+              </Route>
             </Routes>
           </Suspense>
         </div>

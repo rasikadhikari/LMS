@@ -1,5 +1,3 @@
-import React from "react";
-
 const UserProfile = () => {
   const user = {
     name: "John Doe",
