@@ -1,9 +1,40 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "../Service/axios";
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
-  const [userType, setUserType] = useState<"student" | "institute">("student");
+  const [userType] = useState<"student">("student"); // Only allow "student" role
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault(); // Ensure form submission is prevented
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const fullName = formData.get("fullName") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const role = "Student"; // Force role to "Student"
+
+    try {
+      const response = await axios.post("http://localhost:5000/user/signup", {
+        name: fullName,
+        email: email,
+        password: password,
+        role: role,
+      });
+
+      console.log(response);
+
+      if (response.data && response.data.success) {
+        navigate("/login");
+      } else {
+        alert(response.data.message || "Signup failed");
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+      alert("An error occurred. Please try again later.");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -12,14 +43,16 @@ const Signup: React.FC = () => {
           Create LMS Account
         </h2>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSignup}>
           {/* Full Name */}
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
             <input
               type="text"
+              name="fullName"
               className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Enter your name"
+              required
             />
           </div>
 
@@ -28,8 +61,10 @@ const Signup: React.FC = () => {
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
+              name="email"
               className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Enter your email"
+              required
             />
           </div>
 
@@ -38,12 +73,12 @@ const Signup: React.FC = () => {
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
               type="password"
+              name="password"
               className="w-full p-3 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Create a password"
+              required
             />
           </div>
-
-          {/* User Type - Radio Buttons */}
 
           {/* Sign Up Button */}
           <button

@@ -12,8 +12,8 @@ const Signup = lazy(() => import("./Authentication/Signup"));
 const Home = lazy(() => import("./Pages/Home"));
 const Profile = lazy(() => import("./Pages/User"));
 const Course = lazy(() => import("./Pages/CourseDetail"));
-const Lesson = lazy(() => import("./Organization/Lesson"));
-const Enrollment = lazy(() => import("./Organization/Enrollment"));
+const LessonDetail = lazy(() => import("./Pages/LessonDetail"));
+const EnrollmentDetail = lazy(() => import("./Pages/EnrollmentDetail"));
 
 // admin
 const AdminCourse = lazy(() => import("./Organization/Course"));
@@ -53,8 +53,8 @@ function AppContent() {
               <Route path="/home" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/course" element={<Course />} />
-              <Route path="/lesson" element={<Lesson />} />
-              <Route path="/enrollment" element={<Enrollment />} />
+              <Route path="/lesson" element={<LessonDetail />} />
+              <Route path="/enrollment" element={<EnrollmentDetail />} />
 
               <Route path="/admin">
                 <Route path="adminCourse" element={<AdminCourse />} />
