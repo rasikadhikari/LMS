@@ -4,15 +4,18 @@ import "./App.css";
 import Header from "./Layout/Header";
 import Footer from "./Layout/Footer";
 
+
 // Lazy-loaded pages
-const Dashboard = lazy(() => import("./Pages/Dashboard"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Login = lazy(() => import("./Authentication/Login"));
 const Signup = lazy(() => import("./Authentication/Signup"));
-const Home = lazy(() => import("./Pages/Home"));
-const Profile = lazy(() => import("./Pages/User"));
-const Course = lazy(() => import("./Pages/Course"));
-const Lesson = lazy(() => import("./Pages/Lesson"));
-const Enrollment = lazy(() => import("./Pages/Enrollment"));
+const Home = lazy(() => import("./pages/Home"));
+const Profile = lazy(() => import("./pages/User"));
+const Course = lazy(() => import("./pages/CourseDetail"));
+// lazy-loaded pages for Student
+const StudentPage = lazy(() => import("./PageforStudent/StudentPage"))
+// const Lesson = lazy(() => import("./pages/lesson"));
+// const Enrollment = lazy(() => import("./Pages/Enrollment"));
 
 function App() {
   return (
@@ -41,14 +44,15 @@ function AppContent() {
             <Routes>
               <Route path="/" element={<Dashboard />}></Route>
               {/* Student routes */}
+              <Route path="/StudentPage" element={<StudentPage/>} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
 
               <Route path="/home" element={<Home />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/course" element={<Course />} />
-              <Route path="/lesson" element={<Lesson />} />
-              <Route path="/enrollment" element={<Enrollment />} />
+              {/* <Route path="/lesson" element={<Lesson />} />
+              <Route path="/enrollment" element={<Enrollment />} /> */}
             </Routes>
           </Suspense>
         </div>

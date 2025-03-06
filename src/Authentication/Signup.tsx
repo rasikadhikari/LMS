@@ -4,6 +4,15 @@ import { useNavigate } from "react-router-dom";
 const Signup: React.FC = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState<"student" | "institute">("student");
+  
+  const handleSubmit = (e:React.FormEvent) => {
+    e.preventDefault()
+    if(userType === "student") {
+      navigate("/StudentPage")
+    }else{
+      navigate("/Institude")
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black text-white">
@@ -12,7 +21,7 @@ const Signup: React.FC = () => {
           Create LMS Account
         </h2>
 
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Full Name */}
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
