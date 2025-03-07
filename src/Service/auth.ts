@@ -1,9 +1,17 @@
 import { axios } from "./axios";
 
+export interface LoginResponse {
+  token: string;
+  user: {
+    name: string;
+    email: string;
+  };
+}
+
 export const loginUser = async (body: {
   email: string;
   password: string;
-}): Promise<[Error | null, { token: string; message: string } | null]> => {
+}): Promise<[Error | null, LoginResponse | null]> => {
   try {
     const response = await axios.post("/user/login", body);
     return [null, response.data];

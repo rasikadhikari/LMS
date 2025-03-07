@@ -1,37 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "../Service/axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { loginUser } from "../Service/auth";
+import { AuthContext } from "../Context/AuthContext";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const context = useContext(AuthContext);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      const response = await axios.post("http://localhost:5000/user/login", {
-        email,
-        password,
-      });
+    const [error, data] = await loginUser({ email, password });
 
-      console.log(response.data);
+    if (error) {
+      const errorMessage =
+        (error as any)?.response?.data?.message ||
+        "Login failed, please try again.";
+      toast.error(errorMessage);
+      return;
+    }
 
-      if (response.data && response.data.success) {
-        toast.success("Login successful! Redirecting...");
-        setTimeout(() => navigate("/home"), 2000);
-      } else {
-        toast.error(response.data.message || "Login failed");
+    if (data && data.token) {
+      localStorage.setItem("token", data.token);
+      console.log(data);
+      console.log(data.token);
+      if (context) {
+        context.changeAuth(data.token, data.user);
       }
-      console.log(response.data.message);
-    } catch (error: any) {
-      console.error("Error during login:", error);
-      toast.error(
-        error.response?.data?.message || "An error occurred. Please try again."
-      );
+
+      toast.success("Login successful! Redirecting...");
+      navigate("/home");
+    } else {
+      toast.error("Invalid login response");
     }
   };
 

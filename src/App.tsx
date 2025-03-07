@@ -1,9 +1,10 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import Header from "./Layout/Header";
 import Footer from "./Layout/Footer";
 import AdminHeader from "./Layout/AdminHeader";
+import { AuthContext, AuthToken, User } from "./Context/AuthContext";
 
 // Lazy-loaded pages
 const Dashboard = lazy(() => import("./Pages/Dashboard"));
@@ -14,17 +15,31 @@ const Profile = lazy(() => import("./Pages/User"));
 const Course = lazy(() => import("./Pages/CourseDetail"));
 const LessonDetail = lazy(() => import("./Pages/LessonDetail"));
 const EnrollmentDetail = lazy(() => import("./Pages/EnrollmentDetail"));
-
+const AllCourse = lazy(() => import("./Pages/AllCoursePreview"));
 // admin
 const AdminCourse = lazy(() => import("./Organization/Course"));
 const AdminEnrollment = lazy(() => import("./Organization/Enrollment"));
 const AdminLesson = lazy(() => import("./Organization/Lesson"));
 
 function App() {
+  const savedAuth = localStorage.getItem("auth");
+  const initialAuth: AuthToken = savedAuth
+    ? JSON.parse(savedAuth)
+    : { token: null, user: null };
+
+  const [auth, setAuth] = useState<AuthToken>(initialAuth);
+
+  const changeAuth = (token: string, user: User | null) => {
+    const newAuth = { token, user };
+    setAuth(newAuth);
+    localStorage.setItem("auth", JSON.stringify(newAuth)); // Save complete auth to localStorage
+  };
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <AuthContext.Provider value={{ auth, changeAuth }}>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthContext.Provider>
   );
 }
 
@@ -55,6 +70,7 @@ function AppContent() {
               <Route path="/course" element={<Course />} />
               <Route path="/lesson" element={<LessonDetail />} />
               <Route path="/enrollment" element={<EnrollmentDetail />} />
+              <Route path="/courses/:courseId" element={<AllCourse />} />
 
               <Route path="/admin">
                 <Route path="adminCourse" element={<AdminCourse />} />

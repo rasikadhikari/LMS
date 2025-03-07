@@ -1,10 +1,8 @@
-import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../Service/axios";
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
-  const [userType] = useState<"student">("student"); // Only allow "student" role
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault(); // Ensure form submission is prevented
@@ -13,7 +11,7 @@ const Signup: React.FC = () => {
     const fullName = formData.get("fullName") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const role = "Student"; // Force role to "Student"
+    const role = "Student";
 
     try {
       const response = await axios.post("http://localhost:5000/user/signup", {
@@ -25,7 +23,7 @@ const Signup: React.FC = () => {
 
       console.log(response);
 
-      if (response.data && response.data.success) {
+      if (response.data) {
         navigate("/login");
       } else {
         alert(response.data.message || "Signup failed");
