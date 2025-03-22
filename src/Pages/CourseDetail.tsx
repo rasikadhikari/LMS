@@ -9,6 +9,7 @@ interface CourseType {
   courseId: string;
   description: string;
   organization: { name: string } | null;
+  price: string;
 }
 
 function Course() {
@@ -31,7 +32,7 @@ function Course() {
   }, []);
 
   const handleCourseClick = (courseId: string) => {
-    navigate(`/courses/${courseId}`); // Updated to match the path in App.tsx
+    navigate(`/courses/${courseId}`);
   };
 
   return (
@@ -57,10 +58,13 @@ function Course() {
           courses.map((course) => (
             <div
               key={course._id}
-              className="p-6 bg-gradient-to-r from-purple-500 via-indigo-600 to-blue-500 border border-gray-700 rounded-lg text-white font-bold shadow-md flex flex-col justify-between hover:scale-105 transition-transform cursor-pointer"
+              className="p-6 bg-gradient-to-r from-purple-500 via-indigo-600 to-blue-500 border border-gray-700 rounded-lg text-white font-bold shadow-md flex flex-col justify-between "
               onClick={() => handleCourseClick(course._id)}
             >
               <div className="mb-4">
+                <p className="inline-block px-3 py-1 rounded-lg bg-yellow-500 text-black font-bold text-sm shadow-md">
+                  {course.price}
+                </p>
                 <h2 className="text-xl font-semibold">{course.courseName}</h2>
                 <p className="text-sm font-medium text-gray-300 mt-2">
                   Course ID: {course.courseId}
@@ -71,6 +75,9 @@ function Course() {
                 <p className="text-sm font-light text-gray-400 mt-2">
                   Organized by: {course.organization?.name || "N/A"}
                 </p>
+                <button className="border-2 rounded-xl w-20 absolute  scale-105 transition-transform cursor-pointer abs">
+                  Enroll
+                </button>
               </div>
             </div>
           ))

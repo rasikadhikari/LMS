@@ -14,9 +14,6 @@ function Header() {
   };
 
   const user = context?.auth?.token;
-  const userName = context?.auth?.user;
-  console.log(userName);
-  console.log(user);
 
   return (
     <header className="w-full bg-gray-900 text-white shadow-md">

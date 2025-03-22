@@ -50,10 +50,10 @@ const EnrollmentTable = () => {
   }
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-semibold mb-4">Enrollment List</h2>
-      <table className="min-w-full table-auto">
-        <thead className="bg-gray-100">
+    <div className="text-white bg-black min-h-screen p-6">
+      <h2 className="text-4xl font-extrabold mb-4">Enrollment List</h2>
+      <table className="min-w-full table-auto bg-gray-800 rounded-lg shadow-lg">
+        <thead className="bg-black">
           <tr>
             <th className="px-4 py-2 text-left">Student</th>
             <th className="px-4 py-2 text-left">Course</th>
@@ -63,7 +63,7 @@ const EnrollmentTable = () => {
         </thead>
         <tbody>
           {enrollments.map((enrollment) => (
-            <tr key={enrollment._id} className="border-b hover:bg-gray-50">
+            <tr key={enrollment._id} className="border-b border-gray-700">
               <td className="px-4 py-2">{enrollment.student?.name || "N/A"}</td>
               <td className="px-4 py-2">
                 {enrollment.course?.courseName || "N/A"}

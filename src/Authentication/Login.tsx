@@ -11,6 +11,12 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState("");
 
   const context = useContext(AuthContext);
+  type User = {
+    _id?: string;
+    name: string;
+    email: string;
+    role?: string;
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,18 +31,32 @@ const Login: React.FC = () => {
       return;
     }
 
-    if (data && data.token) {
+    if (data && data.token && data.user) {
+      const user: User = data.user;
+      console.log("user--------", user);
+      console.log("data---", data);
+
       localStorage.setItem("token", data.token);
-      console.log(data);
-      console.log(data.token);
+
       if (context) {
-        context.changeAuth(data.token, data.user);
+        context.changeAuth(data.token, {
+          _id: data.user._id || "",
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role || "",
+        });
+        console.log("context-----", context);
       }
 
       toast.success("Login successful! Redirecting...");
-      navigate("/home");
+      if (user.role === "Admin") {
+        navigate("/admin");
+      } else {
+        navigate("/home");
+      }
     } else {
-      toast.error("Invalid login response");
+      toast.error("Invalid login response. Please try again.");
+      console.error("Login response does not contain user data:", data);
     }
   };
 

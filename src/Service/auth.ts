@@ -3,6 +3,8 @@ import { axios } from "./axios";
 export interface LoginResponse {
   token: string;
   user: {
+    role: string;
+    _id: string;
     name: string;
     email: string;
   };

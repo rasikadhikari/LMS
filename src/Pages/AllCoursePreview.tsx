@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import axios from "../Service/axios";
 import VideoPlayer from "../Component/VideoPlayer";
 
-// Types
 interface CourseType {
   _id: string;
   courseName: string;
@@ -123,7 +122,6 @@ function CourseDetail() {
           )}
         </div>
 
-        {/* Right - Video Player */}
         <div className="bg-gray-900 p-4 rounded-lg">
           <h2 className="text-xl font-bold mb-4">Demo Video</h2>
           <VideoPlayer />

@@ -35,7 +35,7 @@ function App() {
     localStorage.setItem("auth", JSON.stringify(newAuth)); // Save complete auth to localStorage
   };
   return (
-    <AuthContext.Provider value={{ auth, changeAuth }}>
+    <AuthContext.Provider value={{ auth, user: auth.user, changeAuth }}>
       <BrowserRouter>
         <AppContent />
       </BrowserRouter>

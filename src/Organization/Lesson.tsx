@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "../Service/axios"; // Assuming you have an axios setup for API calls
+import axios from "../Service/axios";
 
 interface ResourceMaterial {
   type: string;
@@ -10,7 +10,7 @@ interface Lesson {
   _id: string;
   title: string;
   content: string;
-  courseId: { courseName: string }; // Populate courseId to get courseName
+  courseId: { courseName: string };
   resourceMaterial: ResourceMaterial[];
 }
 
@@ -46,10 +46,10 @@ const LessonTable = () => {
   }
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-semibold mb-4">Lesson List</h2>
-      <table className="min-w-full table-auto">
-        <thead className="bg-gray-100">
+    <div className="p-6 text-white bg-black min-h-screen">
+      <h2 className="text-4xl font-extrabold mb-4">Lesson List</h2>
+      <table className="min-w-full table-auto bg-gray-800 rounded-lg shadow-lg">
+        <thead className="bg-black">
           <tr>
             <th className="px-4 py-2 text-left">Title</th>
             <th className="px-4 py-2 text-left">Content</th>
@@ -60,7 +60,7 @@ const LessonTable = () => {
         </thead>
         <tbody>
           {lessons.map((lesson) => (
-            <tr key={lesson._id} className="border-b hover:bg-gray-50">
+            <tr key={lesson._id} className="border-b border-gray-700">
               <td className="px-4 py-2">{lesson.title}</td>
               <td className="px-4 py-2">{lesson.content}</td>
               <td className="px-4 py-2">
