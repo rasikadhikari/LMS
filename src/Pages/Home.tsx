@@ -1,14 +1,22 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "../Service/axios";
 import { useEffect, useState } from "react";
 
 function Home() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
+        const storedUser = localStorage.getItem("token");
+        if (!storedUser) {
+          navigate("/login");
+        } else {
+          setUser(storedUser);
+        }
         const response = await axios.get("/course");
         setCourses(response.data.data);
       } catch (err) {
@@ -30,12 +38,16 @@ function Home() {
         <p className="text-xl mb-8">
           Explore a wide range of courses and start learning today!
         </p>
-        <Link
-          to="/course"
-          className="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-white font-bold rounded-md"
-        >
-          Browse Courses
-        </Link>
+        {user ? (
+          <button
+            onClick={() => navigate("/course")}
+            className="px-4 py-2 bg-white text-blue-500 rounded-md hover:bg-blue-500 hover:text-white"
+          >
+            Explore courses
+          </button>
+        ) : (
+          <button disabled>You must be loggind in </button>
+        )}
       </section>
 
       {/* Course List */}
@@ -63,12 +75,16 @@ function Home() {
                   </p>
                 </div>
                 <div className="mt-4 text-center">
-                  <Link
-                    to="/course"
-                    className="mt-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
-                  >
-                    View More
-                  </Link>
+                  {user ? (
+                    <button
+                      onClick={() => navigate("/course")}
+                      className="px-4 py-2 bg-white text-blue-500 rounded-md hover:bg-blue-500 hover:text-white"
+                    >
+                      View More
+                    </button>
+                  ) : (
+                    <button disabled>You must be Loggin first</button>
+                  )}
                 </div>
               </div>
             ))}
