@@ -10,6 +10,7 @@ export interface User {
 export interface AuthToken {
   token: string | null;
   user: User | null;
+  role: string | null;
 }
 
 export interface AuthContextType {

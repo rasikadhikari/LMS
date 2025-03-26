@@ -19,33 +19,66 @@ interface LessonType {
   resourceMaterial: { type: string; url: string }[];
 }
 
-// Component
+interface AssignmentType {
+  _id: string;
+  title: string;
+  question: string;
+  description: string;
+  courseId: string;
+}
+
+interface SubmissionType {
+  _id: string;
+  student: string;
+  assignment: string;
+  answer: string;
+  files: string[];
+}
+
 function CourseDetail() {
   const { courseId } = useParams<{ courseId: string }>();
 
   const [course, setCourse] = useState<CourseType | null>(null);
   const [lessons, setLessons] = useState<LessonType[]>([]);
+  const [assignments, setAssignments] = useState<AssignmentType[]>([]);
+  const [submissions, setSubmissions] = useState<SubmissionType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCourseDetail = async () => {
+    const fetchCourseData = async () => {
       try {
+        // Fetch Course Details
         const courseResponse = await axios.get(`/course/${courseId}`);
         setCourse(courseResponse.data.data);
 
+        // Fetch Lessons
         const lessonsResponse = await axios.get(`/lesson`);
         const filteredLessons = lessonsResponse.data.data.filter(
           (lesson: LessonType) => lesson.courseId._id === courseId
         );
         setLessons(filteredLessons);
+
+        // Fetch Assignments
+        const assignmentsResponse = await axios.get(`/assignment`);
+        console.log("assignment---", assignmentsResponse.data);
+        const filteredAssignments = assignmentsResponse.data.filter(
+          (assignment: { course: string }) => assignment.course === courseId
+        );
+        console.log("filter-----", filteredAssignments);
+        setAssignments(filteredAssignments);
+        console.log("Assignment courseId structure:", assignmentsResponse.data);
+
+        // Fetch Submissions
+        const submissionResponse = await axios.get(`/submission`);
+        setSubmissions(submissionResponse.data);
       } catch (err) {
         console.log("Failed to fetch data", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchCourseDetail();
+    fetchCourseData();
   }, [courseId]);
 
   if (loading)
@@ -122,9 +155,69 @@ function CourseDetail() {
           )}
         </div>
 
+        {/* Demo Video Section */}
         <div className="bg-gray-900 p-4 rounded-lg">
           <h2 className="text-xl font-bold mb-4">Demo Video</h2>
           <VideoPlayer />
+        </div>
+
+        {/* Assignments Section */}
+        <div className="bg-gray-900 p-4 rounded-lg">
+          <h2 className="text-xl font-bold mb-4">Assignments</h2>
+          {assignments.length === 0 ? (
+            <p>No assignments available for this course.</p>
+          ) : (
+            <div className="space-y-3">
+              {assignments.map((assignment) => {
+                const submission = submissions.find(
+                  (sub) => sub.assignment === assignment._id
+                );
+
+                return (
+                  <div
+                    key={assignment._id}
+                    className="bg-gray-800 p-4 rounded-lg"
+                  >
+                    <h3 className="text-lg font-semibold">
+                      {assignment.title}
+                    </h3>
+                    <p className="text-gray-400">{assignment.description}</p>
+
+                    {submission ? (
+                      <div className="mt-2">
+                        <p className="text-green-400 font-semibold">
+                          Submitted:
+                        </p>
+                        <p className="text-gray-400">{assignment.question}</p>
+                        <p className="text-gray-300">{submission.answer}</p>
+                        {submission.files.length > 0 && (
+                          <div className="mt-2">
+                            <p className="font-semibold">Uploaded Files:</p>
+                            <ul className="list-disc pl-5">
+                              {submission.files.map((file, index) => (
+                                <li key={index}>
+                                  <a
+                                    href={file}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-400 hover:underline"
+                                  >
+                                    File {index + 1}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-red-400">No submission yet.</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -30,9 +30,9 @@ function App() {
   const [auth, setAuth] = useState<AuthToken>(initialAuth);
 
   const changeAuth = (token: string, user: User | null) => {
-    const newAuth = { token, user };
+    const newAuth = { token, user, role: user?.role ?? null };
     setAuth(newAuth);
-    localStorage.setItem("auth", JSON.stringify(newAuth)); // Save complete auth to localStorage
+    localStorage.setItem("auth", JSON.stringify(newAuth));
   };
   return (
     <AuthContext.Provider value={{ auth, user: auth.user, changeAuth }}>
