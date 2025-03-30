@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "../Service/axios";
 import VideoPlayer from "../Component/VideoPlayer";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface CourseType {
   _id: string;
@@ -69,6 +71,7 @@ function CourseDetail() {
         setSubmissions(submissionResponse.data);
       } catch (err) {
         console.log("Failed to fetch data", err);
+        toast.error("Failed to load course data.");
       } finally {
         setLoading(false);
       }
@@ -93,6 +96,11 @@ function CourseDetail() {
     const formData = new FormData(e.currentTarget);
     const answer = formData.get("answer") as string;
 
+    if (!answer.trim()) {
+      toast.error("Answer cannot be empty.");
+      return;
+    }
+
     try {
       const response = await axios.post("/submission", {
         assignment: assignmentId,
@@ -100,14 +108,14 @@ function CourseDetail() {
       });
 
       if (response.status === 201) {
-        alert("Assignment submitted successfully!");
+        toast.success("Assignment submitted successfully!");
         setSubmissions([...submissions, response.data]);
       } else {
-        alert("Failed to submit assignment.");
+        toast.error("Failed to submit assignment.");
       }
     } catch (error) {
       console.error("Error submitting answer:", error);
-      alert("Something went wrong. Try again.");
+      toast.error("Something went wrong. Try again.");
     }
   };
 

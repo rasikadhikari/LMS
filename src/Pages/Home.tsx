@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import axios from "../Service/axios";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Home() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -13,13 +15,17 @@ function Home() {
       try {
         const storedUser = localStorage.getItem("token");
         if (!storedUser) {
+          toast.warn("You must be logged in to view courses.");
           navigate("/login");
+          return;
         } else {
           setUser(storedUser);
         }
         const response = await axios.get("/course");
         setCourses(response.data.data);
+        toast.success("Courses loaded successfully!");
       } catch (err) {
+        toast.error("Failed to load courses. Please try again later.");
         console.log(err);
       } finally {
         setLoading(false);
@@ -46,7 +52,7 @@ function Home() {
             Explore courses
           </button>
         ) : (
-          <button disabled>You must be loggind in </button>
+          <button disabled>You must be logged in</button>
         )}
       </section>
 
@@ -83,7 +89,7 @@ function Home() {
                       View More
                     </button>
                   ) : (
-                    <button disabled>You must be Loggin first</button>
+                    <button disabled>You must be logged in first</button>
                   )}
                 </div>
               </div>

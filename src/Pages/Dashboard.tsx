@@ -10,7 +10,7 @@ function App() {
         className="hero relative flex items-center justify-center h-[400px] bg-gray-900"
         style={{
           backgroundImage: `url(${background})`,
-          backgroundSize: "cover", // or '100% auto' or 'cover' if you want it full.
+          backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
           height: "300px",

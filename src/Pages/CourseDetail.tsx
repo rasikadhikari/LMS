@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import courseImage from "../Images/Course.jpg";
 import axios from "../Service/axios";
 import PayPalButton from "../Layout/PayPalButton";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface CourseType {
   _id: string;
@@ -38,6 +40,7 @@ function Course() {
         setCourses(response.data.data);
       } catch (err) {
         console.log("Failed to fetch courses", err);
+        toast.error("Failed to load courses. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -60,10 +63,11 @@ function Course() {
           );
           setEnrolledCourses(enrolledCourseIds);
         } else {
-          console.log("No logged-in student found.");
+          toast.error("No logged-in student found.");
         }
       } catch (err) {
         console.log("Failed to fetch users", err);
+        toast.error("Failed to fetch user data. Please try again.");
       }
     };
 
@@ -78,8 +82,7 @@ function Course() {
   const handlePaymentSuccess = async (details: any) => {
     if (details.status === "COMPLETED") {
       console.log("Payment Success", details);
-      alert("Payment successful! You are now enrolled.");
-
+      toast.success("Payment successful! You are now enrolled.");
       if (selectedCourse) {
         try {
           const enrollmentData = {
@@ -103,11 +106,11 @@ function Course() {
             "Error during enrollment creation:",
             err.response || err
           );
-          alert("May be you are already enrolled in this course.");
+          toast.error("Error during enrollment. Please try again.");
         }
       }
     } else {
-      alert("Payment processing failed. Please try again.");
+      toast.error("Payment processing failed. Please try again.");
     }
   };
 

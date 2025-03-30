@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
 import axios from "../Service/axios";
+import { toast } from "react-toastify"; // Import the toast function
+import "react-toastify/dist/ReactToastify.css"; // Import toast styles
 
 const UserProfile = () => {
   const { auth } = useContext(AuthContext) || {};
@@ -21,8 +23,13 @@ const UserProfile = () => {
 
           console.log("User Found:", user);
           setUserDetails(user);
+
+          // Success toast message
+          toast.success("User details loaded successfully!");
         } catch (error) {
           console.error("Error fetching user details:", error);
+          // Error toast message
+          toast.error("Failed to load user details.");
         }
       }
     };

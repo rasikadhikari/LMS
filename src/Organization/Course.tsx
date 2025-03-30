@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "../Service/axios"; // Assuming you have this setup for axios instance
+import axios from "../Service/axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface CourseType {
   _id: string;
@@ -16,20 +18,38 @@ function Course() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await axios.get("/course");
-        setCourses(response.data.data);
-        console.log(response);
-      } catch (error) {
-        console.error("Failed to fetch courses:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCourses();
   }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const response = await axios.get("/course");
+      setCourses(response.data.data);
+      console.log(response);
+      toast.success("Courses loaded successfully!");
+    } catch (error) {
+      console.error("Failed to fetch courses:", error);
+      toast.error("Failed to load courses.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this course?")) {
+      return;
+    }
+
+    try {
+      await axios.delete(`/course/${id}`);
+      setCourses(courses.filter((course) => course._id !== id));
+      toast.success("Course deleted successfully!");
+      console.log("Course deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting course:", error);
+      toast.error("Failed to delete course.");
+    }
+  };
 
   if (loading) {
     return (
@@ -76,7 +96,10 @@ function Course() {
                   Edit
                 </button>{" "}
                 |{" "}
-                <button className="text-red-400 hover:text-red-600 cursor-pointer">
+                <button
+                  className="text-red-400 hover:text-red-600 cursor-pointer"
+                  onClick={() => handleDelete(course._id)}
+                >
                   Delete
                 </button>
               </td>

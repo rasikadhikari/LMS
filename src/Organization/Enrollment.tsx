@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "../Service/axios"; // Use your axios setup
+import axios from "../Service/axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface StudentType {
   _id: string;
@@ -23,24 +25,39 @@ const EnrollmentTable = () => {
   const [enrollments, setEnrollments] = useState<EnrollmentType[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  useEffect(() => {
-    const fetchEnrollments = async () => {
-      try {
-        const response = await axios.get("/enroll");
-        setEnrollments(response.data.data);
-        console.log("enrollments---", response.data.data);
-      } catch (error) {
-        console.error("Failed to fetch enrollments:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
+  useEffect(() => {
     fetchEnrollments();
   }, []);
 
-  const handleDelete = (id: string) => {
-    console.log("Delete Enrollment:", id);
+  const fetchEnrollments = async () => {
+    try {
+      const response = await axios.get("/enroll");
+      setEnrollments(response.data.data);
+      console.log("enrollments---", response.data.data);
+      toast.success("Enrollments loaded successfully!");
+    } catch (error) {
+      console.error("Failed to fetch enrollments:", error);
+      toast.error("Failed to load enrollments.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this enrollment?")) {
+      return;
+    }
+
+    try {
+      await axios.delete(`/enroll/${id}`);
+      setEnrollments(enrollments.filter((enrollment) => enrollment._id !== id));
+      toast.success("Enrollment deleted successfully!");
+      console.log("Enrollment deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting enrollment:", error);
+      toast.error("Failed to delete enrollment.");
+    }
   };
 
   if (loading) {

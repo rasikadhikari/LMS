@@ -37,6 +37,10 @@ const EditLesson = lazy(() => import("./Module sub-folder/Edit/EditLesson"));
 const EditAssignment = lazy(
   () => import("./Module sub-folder/Edit/EditAssignment")
 );
+// view component
+const ViewAssignment = lazy(
+  () => import("./Module sub-folder/View/ViewAssignment")
+);
 function App() {
   const savedAuth = localStorage.getItem("auth");
   const initialAuth: AuthToken = savedAuth
@@ -103,6 +107,8 @@ function AppContent() {
                 <Route path="editEnrollment/:id" Component={EditEnrollment} />
                 <Route path="editLesson/:id" Component={EditLesson} />
                 <Route path="editAssignment/:id" Component={EditAssignment} />
+                {/* view admin*/}
+                <Route path="ViewAssignment/:id" Component={ViewAssignment} />
               </Route>
             </Routes>
           </Suspense>

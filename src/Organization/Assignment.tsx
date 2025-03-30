@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "../Service/axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Course {
   _id: string;
@@ -30,8 +32,10 @@ const AssignmentTable = () => {
         const response = await axios.get("/assignment");
         console.log("API Response:", response.data);
         setAssignments(response.data);
+        toast.success("Assignments loaded successfully!");
       } catch (error) {
         console.error("Error fetching assignments:", error);
+        toast.error("Failed to load assignments.");
       } finally {
         setLoading(false);
       }
@@ -40,8 +44,20 @@ const AssignmentTable = () => {
     fetchAssignments();
   }, []);
 
-  const handleDelete = (id: string) => {
-    console.log("Delete assignment with ID:", id);
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this assignment?")) {
+      return;
+    }
+
+    try {
+      await axios.delete(`/assignment/${id}`);
+      setAssignments(assignments.filter((assignment) => assignment._id !== id));
+      toast.success("Assignment deleted successfully!");
+      console.log("Assignment deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting assignment:", error);
+      toast.error("Failed to delete assignment.");
+    }
   };
 
   if (loading) {

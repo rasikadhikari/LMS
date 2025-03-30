@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../Service/axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 interface Submission {
@@ -16,29 +18,36 @@ const SubmissionTable = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchSubmissions = async () => {
-      try {
-        const response = await axios.get("/submission");
-        console.log("API Response:", response.data); // Debugging log
-
-        if (!Array.isArray(response.data)) {
-          console.error("Invalid API response format:", response.data);
-          return;
-        }
-
-        setSubmissions(response.data);
-      } catch (error) {
-        console.error("Error fetching submissions:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSubmissions();
   }, []);
 
-  const handleDelete = (id: string) => {
-    console.log("Delete submission with ID:", id);
+  const fetchSubmissions = async () => {
+    try {
+      const response = await axios.get("/submission");
+      setSubmissions(response.data);
+      toast.success("Submissions loaded successfully!");
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+      toast.error("Failed to load submissions.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this submission?")) {
+      return;
+    }
+
+    try {
+      await axios.delete(`/submission/${id}`);
+      setSubmissions(submissions.filter((submission) => submission._id !== id));
+      toast.success("Submission deleted successfully!");
+      console.log("Submission deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting submission:", error);
+      toast.error("Failed to delete submission.");
+    }
   };
 
   if (loading) {
@@ -51,8 +60,8 @@ const SubmissionTable = () => {
       <table className="min-w-full table-auto bg-gray-800 rounded-lg shadow-lg">
         <thead className="bg-black">
           <tr>
-            <th className="px-4 py-2 text-left">Student</th>
-            <th className="px-4 py-2 text-left">Assignment</th>
+            <th className="px-4 py-2 text-left">Submitted By</th>
+            <th className="px-4 py-2 text-left">Assignment Id</th>
             <th className="px-4 py-2 text-left">Answer</th>
             <th className="px-4 py-2 text-left">Files</th>
             <th className="px-4 py-2 text-left">Actions</th>
@@ -61,10 +70,12 @@ const SubmissionTable = () => {
         <tbody>
           {submissions.map((submission) => (
             <tr key={submission._id} className="border-b border-gray-700">
-              <td className="px-4 py-2">{submission.student?.name}</td>
-              <td className="px-4 py-2">{submission.assignment}</td>
+              <td className="px-4 py-2">{submission.student?.name || "N/A"}</td>
+              <td className="px-4 py-2">{submission.assignment || "N/A"}</td>
               <td className="px-4 py-2">
-                {submission.answer.substring(0 - 10)}
+                {submission.answer.length > 30
+                  ? submission.answer.substring(0, 30) + "..."
+                  : submission.answer}
               </td>
               <td className="px-4 py-2">
                 {submission.files.length > 0
@@ -72,9 +83,9 @@ const SubmissionTable = () => {
                       <div key={index}>
                         <a
                           href={file}
-                          className="text-blue-500"
                           target="_blank"
                           rel="noopener noreferrer"
+                          className="text-blue-500 underline"
                         >
                           File {index + 1}
                         </a>
@@ -83,6 +94,14 @@ const SubmissionTable = () => {
                   : "No files"}
               </td>
               <td className="px-4 py-2">
+                <button
+                  className="bg-blue-500 text-white px-3 py-1 rounded cursor-pointer"
+                  onClick={() =>
+                    navigate(`/admin/ViewAssignment/${submission._id}`)
+                  } // Navigate to the View page
+                >
+                  View
+                </button>
                 <button
                   onClick={() => handleDelete(submission._id)}
                   className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer"
