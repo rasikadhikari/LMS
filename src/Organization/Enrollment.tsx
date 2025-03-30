@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../Service/axios"; // Use your axios setup
+import { useNavigate } from "react-router-dom";
 
 interface StudentType {
   _id: string;
@@ -21,12 +22,13 @@ interface EnrollmentType {
 const EnrollmentTable = () => {
   const [enrollments, setEnrollments] = useState<EnrollmentType[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchEnrollments = async () => {
       try {
         const response = await axios.get("/enroll");
         setEnrollments(response.data.data);
+        console.log("enrollments---", response.data.data);
       } catch (error) {
         console.error("Failed to fetch enrollments:", error);
       } finally {
@@ -36,10 +38,6 @@ const EnrollmentTable = () => {
 
     fetchEnrollments();
   }, []);
-
-  const handleEdit = (id: string) => {
-    console.log("Edit Enrollment:", id);
-  };
 
   const handleDelete = (id: string) => {
     console.log("Delete Enrollment:", id);
@@ -52,6 +50,7 @@ const EnrollmentTable = () => {
   return (
     <div className="text-white bg-black min-h-screen p-6">
       <h2 className="text-4xl font-extrabold mb-4">Enrollment List</h2>
+
       <table className="min-w-full table-auto bg-gray-800 rounded-lg shadow-lg">
         <thead className="bg-black">
           <tr>
@@ -71,14 +70,16 @@ const EnrollmentTable = () => {
               <td className="px-4 py-2 capitalize">{enrollment.status}</td>
               <td className="px-4 py-2">
                 <button
-                  onClick={() => handleEdit(enrollment._id)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
+                  onClick={() =>
+                    navigate(`/admin/editEnrollment/${enrollment._id}`)
+                  }
+                  className="bg-blue-500 text-white px-3 py-1 rounded mr-2 cursor-pointer"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(enrollment._id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
+                  className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer"
                 >
                   Delete
                 </button>

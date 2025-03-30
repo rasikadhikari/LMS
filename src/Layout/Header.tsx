@@ -117,8 +117,8 @@ function Header() {
           </Link>
           {userRole === "Admin" && (
             <Link
-              to="/admin"
-              className="block bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100"
+              to="/admin/adminCourse"
+              className="block bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-700"
               onClick={() => setMenuOpen(false)}
             >
               Dashboard
@@ -144,7 +144,7 @@ function Header() {
               </Link>
               <Link
                 to="/signup"
-                className="block bg-white text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100"
+                className="block  text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-gray-100"
                 onClick={() => setMenuOpen(false)}
               >
                 Signup

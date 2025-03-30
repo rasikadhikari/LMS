@@ -12,21 +12,27 @@ interface CourseType {
   organization: { name: string } | null;
   price: string;
 }
+interface User {
+  _id: string;
+  role: string;
+  name: string;
+  email: string;
+}
 
 function Course() {
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  // Tracks which course is currently selected for payment
+  const [studentId, setStudentId] = useState<string | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<{
     id: string;
     price: string;
   } | null>(null);
-  // Track the courses the user is enrolled in. In a real app, this would come from your backend or user context.
   const [enrolledCourses, setEnrolledCourses] = useState<string[]>([]);
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState<boolean>(false); // Track payment success state
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCourse = async () => {
+    const fetchCourses = async () => {
       try {
         const response = await axios.get("/course");
         setCourses(response.data.data);
@@ -36,28 +42,70 @@ function Course() {
         setLoading(false);
       }
     };
-    fetchCourse();
 
-    // Optionally, fetch enrolled courses for the user from the backend
-    // axios.get("/user/enrollments").then((res) => setEnrolledCourses(res.data.enrolledCourseIds));
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("/user");
+        const loggedInUser = response.data.data.find(
+          (user: User) => user.email === "test@gmail.com"
+        );
+
+        if (loggedInUser) {
+          setStudentId(loggedInUser._id);
+
+          // Fetch enrolled courses for this user
+          const enrollments = await axios.get(`/enroll/${loggedInUser._id}`);
+          const enrolledCourseIds = enrollments.data.map(
+            (enrollment: any) => enrollment.course
+          );
+          setEnrolledCourses(enrolledCourseIds);
+        } else {
+          console.log("No logged-in student found.");
+        }
+      } catch (err) {
+        console.log("Failed to fetch users", err);
+      }
+    };
+
+    fetchCourses();
+    fetchUsers();
   }, []);
 
-  // Handle course enrollment selection
   const EnrollClick = (courseId: string, price: string) => {
     setSelectedCourse({ id: courseId, price });
   };
 
-  // Handle payment success: update the enrollment state and navigate to course detail page
-  const handlePaymentSuccess = (details: any) => {
+  const handlePaymentSuccess = async (details: any) => {
     if (details.status === "COMPLETED") {
       console.log("Payment Success", details);
       alert("Payment successful! You are now enrolled.");
-      // Add the course to the enrolled list
+
       if (selectedCourse) {
-        setEnrolledCourses((prev) => [...prev, selectedCourse.id]);
+        try {
+          const enrollmentData = {
+            student: studentId,
+            course: selectedCourse.id,
+            progress: 0,
+            lessonCompleted: [],
+            status: "enrolled",
+          };
+
+          await axios.post("/enroll", enrollmentData);
+
+          // Update state to prevent duplicate payments
+          setEnrolledCourses((prev) => [...prev, selectedCourse.id]);
+          setSelectedCourse(null);
+          setIsPaymentSuccess(true);
+
+          navigate(`/courses/${selectedCourse?.id}`);
+        } catch (err: any) {
+          console.error(
+            "Error during enrollment creation:",
+            err.response || err
+          );
+          alert("May be you are already enrolled in this course.");
+        }
       }
-      setSelectedCourse(null);
-      navigate(`/courses/${selectedCourse?.id}`);
     } else {
       alert("Payment processing failed. Please try again.");
     }
@@ -102,7 +150,6 @@ function Course() {
                 <p className="text-sm font-light text-gray-400 mt-2">
                   Organized by: {course.organization?.name || "N/A"}
                 </p>
-                {/* If user is already enrolled, show a "Start" button */}
                 {enrolledCourses.includes(course._id) ? (
                   <button
                     onClick={() => navigate(`/courses/${course._id}`)}
@@ -125,7 +172,7 @@ function Course() {
       </div>
 
       {/* Show PayPal payment modal if a course is selected for enrollment */}
-      {selectedCourse && (
+      {selectedCourse && !isPaymentSuccess && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
             <h2 className="text-xl font-bold mb-4 text-black">

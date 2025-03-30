@@ -9,6 +9,7 @@ interface CourseType {
   courseId: string;
   description: string;
   organization: { name: string } | null;
+  Lecturer: string;
 }
 
 interface LessonType {
@@ -25,6 +26,7 @@ interface AssignmentType {
   question: string;
   description: string;
   courseId: string;
+  course: string;
 }
 
 interface SubmissionType {
@@ -48,28 +50,21 @@ function CourseDetail() {
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        // Fetch Course Details
         const courseResponse = await axios.get(`/course/${courseId}`);
         setCourse(courseResponse.data.data);
 
-        // Fetch Lessons
         const lessonsResponse = await axios.get(`/lesson`);
         const filteredLessons = lessonsResponse.data.data.filter(
           (lesson: LessonType) => lesson.courseId._id === courseId
         );
         setLessons(filteredLessons);
 
-        // Fetch Assignments
         const assignmentsResponse = await axios.get(`/assignment`);
-        console.log("assignment---", assignmentsResponse.data);
         const filteredAssignments = assignmentsResponse.data.filter(
           (assignment: { course: string }) => assignment.course === courseId
         );
-        console.log("filter-----", filteredAssignments);
         setAssignments(filteredAssignments);
-        console.log("Assignment courseId structure:", assignmentsResponse.data);
 
-        // Fetch Submissions
         const submissionResponse = await axios.get(`/submission`);
         setSubmissions(submissionResponse.data);
       } catch (err) {
@@ -86,14 +81,38 @@ function CourseDetail() {
 
   if (!course) return <p className="text-center mt-10">Course not found.</p>;
 
-  // Handle expand/collapse for lessons
   const toggleLesson = (lessonId: string) => {
     setExpandedLesson((prev) => (prev === lessonId ? null : lessonId));
   };
 
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+    assignmentId: string
+  ) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const answer = formData.get("answer") as string;
+
+    try {
+      const response = await axios.post("/submission", {
+        assignment: assignmentId,
+        answer: answer,
+      });
+
+      if (response.status === 201) {
+        alert("Assignment submitted successfully!");
+        setSubmissions([...submissions, response.data]);
+      } else {
+        alert("Failed to submit assignment.");
+      }
+    } catch (error) {
+      console.error("Error submitting answer:", error);
+      alert("Something went wrong. Try again.");
+    }
+  };
+
   return (
     <div className="p-8 bg-black text-white min-h-screen">
-      {/* Course Info */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold">{course.courseName}</h1>
         <p className="mt-2 text-gray-300">Course ID: {course.courseId}</p>
@@ -101,11 +120,12 @@ function CourseDetail() {
         <p className="mt-2 text-gray-400">
           Organized by: {course.organization?.name || "N/A"}
         </p>
+        <p className="mt-2 text-blue-400 text-bold font-bold">
+          Head Lecturer: {course.Lecturer}
+        </p>
       </div>
 
-      {/* Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Left - Lessons List */}
         <div className="col-span-2 bg-gray-900 p-4 rounded-lg">
           <h2 className="text-xl font-bold mb-4">Lessons</h2>
           {lessons.length === 0 ? (
@@ -155,67 +175,81 @@ function CourseDetail() {
           )}
         </div>
 
-        {/* Demo Video Section */}
         <div className="bg-gray-900 p-4 rounded-lg">
           <h2 className="text-xl font-bold mb-4">Demo Video</h2>
           <VideoPlayer />
         </div>
 
-        {/* Assignments Section */}
         <div className="bg-gray-900 p-4 rounded-lg">
           <h2 className="text-xl font-bold mb-4">Assignments</h2>
-          {assignments.length === 0 ? (
-            <p>No assignments available for this course.</p>
+
+          <h3 className="text-lg font-semibold text-green-400 mb-2">
+            Submitted Assignments
+          </h3>
+          {assignments.filter((a) =>
+            submissions.some((s) => s.assignment === a._id)
+          ).length === 0 ? (
+            <p className="text-gray-400">
+              No assignments have been submitted yet.
+            </p>
           ) : (
             <div className="space-y-3">
-              {assignments.map((assignment) => {
-                const submission = submissions.find(
-                  (sub) => sub.assignment === assignment._id
-                );
+              {assignments
+                .filter((a) => submissions.some((s) => s.assignment === a._id))
+                .map((assignment) => {
+                  const submission = submissions.find(
+                    (sub) => sub.assignment === assignment._id
+                  );
+                  return (
+                    <div
+                      key={assignment._id}
+                      className="bg-gray-800 p-4 rounded-lg"
+                    >
+                      <h3 className="text-lg font-semibold">
+                        {assignment.question}
+                      </h3>
+                      <p className="text-gray-400">{assignment.course}</p>
+                      <p className="text-green-400 font-semibold">Submitted:</p>
+                      <p className="text-gray-300">{submission?.answer}</p>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
 
-                return (
-                  <div
+          <h3 className="text-lg font-semibold text-red-400 mt-6 mb-2">
+            Pending Assignments
+          </h3>
+          {assignments.filter(
+            (a) => !submissions.some((s) => s.assignment === a._id)
+          ).length === 0 ? (
+            <p className="text-gray-400">No pending assignments.</p>
+          ) : (
+            <div className="space-y-3">
+              {assignments
+                .filter((a) => !submissions.some((s) => s.assignment === a._id))
+                .map((assignment) => (
+                  <form
                     key={assignment._id}
+                    onSubmit={(e) => handleSubmit(e, assignment._id)}
                     className="bg-gray-800 p-4 rounded-lg"
                   >
                     <h3 className="text-lg font-semibold">
-                      {assignment.title}
+                      {assignment.question}
                     </h3>
-                    <p className="text-gray-400">{assignment.description}</p>
-
-                    {submission ? (
-                      <div className="mt-2">
-                        <p className="text-green-400 font-semibold">
-                          Submitted:
-                        </p>
-                        <p className="text-gray-400">{assignment.question}</p>
-                        <p className="text-gray-300">{submission.answer}</p>
-                        {submission.files.length > 0 && (
-                          <div className="mt-2">
-                            <p className="font-semibold">Uploaded Files:</p>
-                            <ul className="list-disc pl-5">
-                              {submission.files.map((file, index) => (
-                                <li key={index}>
-                                  <a
-                                    href={file}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-400 hover:underline"
-                                  >
-                                    File {index + 1}
-                                  </a>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-red-400">No submission yet.</p>
-                    )}
-                  </div>
-                );
-              })}
+                    <textarea
+                      name="answer"
+                      className="w-full p-2 bg-gray-700 rounded-lg text-white"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg"
+                    >
+                      Submit Answer
+                    </button>
+                  </form>
+                ))}
             </div>
           )}
         </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../Service/axios";
+import { useNavigate } from "react-router-dom";
 
 interface ResourceMaterial {
   type: string;
@@ -17,7 +18,7 @@ interface Lesson {
 const LessonTable = () => {
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchLessons = async () => {
       try {
@@ -33,10 +34,6 @@ const LessonTable = () => {
     fetchLessons();
   }, []);
 
-  const handleEdit = (id: string) => {
-    console.log("Edit lesson with ID:", id);
-  };
-
   const handleDelete = (id: string) => {
     console.log("Delete lesson with ID:", id);
   };
@@ -48,6 +45,12 @@ const LessonTable = () => {
   return (
     <div className="p-6 text-white bg-black min-h-screen">
       <h2 className="text-4xl font-extrabold mb-4">Lesson List</h2>
+      <button
+        onClick={() => navigate("/admin/createLesson")}
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded cursor-pointer"
+      >
+        Add lesson
+      </button>
       <table className="min-w-full table-auto bg-gray-800 rounded-lg shadow-lg">
         <thead className="bg-black">
           <tr>
@@ -77,14 +80,14 @@ const LessonTable = () => {
               </td>
               <td className="px-4 py-2">
                 <button
-                  onClick={() => handleEdit(lesson._id)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
+                  onClick={() => navigate(`/admin/editLesson/${lesson._id}`)}
+                  className="bg-blue-500 text-white px-3 py-1 rounded mr-2 cursor-pointer"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleDelete(lesson._id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
+                  className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer"
                 >
                   Delete
                 </button>

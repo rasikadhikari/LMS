@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "../Service/axios"; // Assuming you have this setup for axios instance
+import { useNavigate } from "react-router-dom";
 
 interface CourseType {
   _id: string;
@@ -12,6 +13,7 @@ interface CourseType {
 function Course() {
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -39,6 +41,12 @@ function Course() {
     <div className="bg-black text-white min-h-screen p-6">
       {/* Courses Table */}
       <h2 className="text-4xl font-extrabold mb-4">Course List</h2>
+      <button
+        onClick={() => navigate("/admin/createCourse")}
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded cursor-pointer"
+      >
+        Add Course
+      </button>
       <table className="min-w-full table-auto bg-gray-800 rounded-lg shadow-lg">
         <thead>
           <tr>
@@ -61,11 +69,14 @@ function Course() {
                 {course.organization?.name || "N/A"}
               </td>
               <td className="px-6 py-4">
-                <button className="text-blue-400 hover:text-blue-600">
+                <button
+                  className="text-blue-400 hover:text-blue-600 cursor-pointer"
+                  onClick={() => navigate(`/admin/editCourse/${course._id}`)}
+                >
                   Edit
                 </button>{" "}
                 |{" "}
-                <button className="text-red-400 hover:text-red-600">
+                <button className="text-red-400 hover:text-red-600 cursor-pointer">
                   Delete
                 </button>
               </td>

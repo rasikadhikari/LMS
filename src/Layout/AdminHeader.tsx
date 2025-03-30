@@ -39,6 +39,19 @@ const AdminHeader = () => {
           >
             Lessons
           </Link>
+
+          <Link
+            to="/admin/adminAssignment"
+            className="hover:text-blue-400 transition"
+          >
+            Assignments
+          </Link>
+          <Link
+            to="/admin/adminSubmission"
+            className="hover:text-blue-400 transition"
+          >
+            Submission
+          </Link>
           <Link to="/" className="hover:text-blue-400 transition">
             Student Dashboard
           </Link>
@@ -79,6 +92,18 @@ const AdminHeader = () => {
           </Link>
           <Link to="/" className="block hover:text-blue-400">
             Student Dashboard
+          </Link>
+          <Link
+            to="/admin/adminAssignment"
+            className="block hover:text-blue-400 transition"
+          >
+            Assignments
+          </Link>
+          <Link
+            to="/admin/adminSubmission"
+            className="block hover:text-blue-400 transition"
+          >
+            Submission
           </Link>
           <button
             onClick={handleLogout}
